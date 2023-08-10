@@ -1,0 +1,68 @@
+{
+    "variables": {
+      "ami_name": "{{env `AMI_NAME`}}",
+      "env": "{{env `ENV`}}",
+      "region": "{{env `REGION`}}",
+      "security_group_id": "{{env `SECURITY_GROUP_ID`}}",
+      "subnet_id": "{{env `SUBNET_ID`}}",
+      "vpc_id": "{{env `VPC_ID`}}",
+      "iam_instance_profile": "{{env `IAM_INSTANCE_PROFILE`}}",
+      "ssh_keypair_name": "{{env `SSH_KEYPAIR_NAME`}}",
+      "ssh_private_key_file": "{{env `SSH_PRIVATE_KEY_FILE`}}",
+      "source_ami_filter": "{{env `SOURCE_AMI_FILTER`}}",
+      "instance_type": "{{env `INSTANCE_TYPE`}}"
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+	    "launch_block_device_mappings": [
+       		 {
+			 "device_name": "/dev/xvda",
+         		 "volume_size": 8,
+         		 "volume_type": "gp3",
+          		 "delete_on_termination": true
+       		 }
+		],
+            "region": "{{ user `region`}}",
+	    "source_ami_filter": {
+        	"filters": {
+          		"virtualization-type": "hvm",
+          		"name": "{{ user `source_ami_filter`}}",
+          		"root-device-type": "ebs"
+        		},
+        	"owners": ["137112412989"],
+        	"most_recent": true
+	    },
+	    "associate_public_ip_address": true,
+	    "vpc_id": "{{ user `vpc_id`}}",
+	    "subnet_id": "{{user `subnet_id`}}",
+	    "security_group_id": "{{user `security_group_id`}}",
+            "instance_type": "{{ user `instance_type`}}",
+            "ssh_username": "ec2-user",
+	    "ssh_keypair_name": "{{user `ssh_keypair_name`}}",
+	    "ssh_private_key_file": "{{user `ssh_private_key_file`}}",
+	    "ssh_interface": "private_ip",
+	    "iam_instance_profile": "{{user `iam_instance_profile`}}",
+            "ami_name": "{{ user `ami_name`}}",
+            "tags": {
+                "Name": "{{ user `ami_name`}}",
+                "environment": "{{ user `env`}}",
+                "builder": "packer",
+		"owner": "xenonfrey@protonmail.com",
+		"system": "infra",
+		"service": "automation,patching"
+            }
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "file",
+            "source": "$HOME/packer-ami-builder/deploy-ami-multiarch-lt/provisioner_x86.sh",
+            "destination": "~/provisioner_x86.sh"
+	},
+        {
+            "type": "shell",
+	    "inline": ["sudo bash ~/provisioner_x86.sh"]
+        }
+    ]
+}
