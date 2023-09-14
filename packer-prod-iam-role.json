@@ -43,8 +43,8 @@
         "ec2:DescribeSpotPriceHistory",
         "ec2:DescribeVpcs",
         "autoscaling:StartInstanceRefresh",
-	      "iam:PassRole",
-	      "iam:GetInstanceProfile"
+	"iam:PassRole",
+	"iam:GetInstanceProfile"
       ],
       "Resource": "*"
     },
